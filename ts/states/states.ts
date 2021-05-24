@@ -4,6 +4,6 @@ export default interface State {
   resources: ResourceObj;
   stateStart: number;
 
-  update(): State|undefined;
+  update(): State;
   draw(): void;   
 }

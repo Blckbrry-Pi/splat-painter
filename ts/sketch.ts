@@ -21,16 +21,8 @@ function draw(): void {
 
   background(255);
 
-  let updateReturnVal = currState.update();
-  switch (updateReturnVal) {
-    case undefined:
-      currState.draw()
-      break;
-  
-    default:
-      currState = updateReturnVal;
-      draw();
-  }
+  currState = currState.update();
+  currState.draw();
 }
 
 function windowResized(): void {

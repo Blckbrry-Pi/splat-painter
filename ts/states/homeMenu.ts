@@ -55,7 +55,7 @@ export default class {
   }
   
 
-  update(): State|undefined {
+  update(): State {
     this.onMousePress = mouseIsPressed && !this.mouseWasPressed;
     this.mouseWasPressed = mouseIsPressed;
 
@@ -65,7 +65,7 @@ export default class {
 
     if(this.buttons[0].isHovered(relativeMouse) && this.onMousePress) return new SettingsPage(this, this.resources);
     if(this.buttons[1].isHovered(relativeMouse) && this.onMousePress) return new SettingsPage(this, this.resources);
-    return undefined;
+    return this;
   }
   
   draw(): void {

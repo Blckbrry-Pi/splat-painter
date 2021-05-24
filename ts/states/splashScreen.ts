@@ -17,7 +17,7 @@ export default class {
   }
   
 
-  update(): State|undefined {
+  update(): State {
     if (
       (millis() - this.stateStart >  400 && this.paintSplatters.length < 1) ||
       (millis() - this.stateStart >  800 && this.paintSplatters.length < 2) ||
@@ -26,17 +26,14 @@ export default class {
       this.paintSplatters.push(new PaintSplatter());
     }
     
-    if (millis() - this.stateStart >= 4000) {
-      return new homeMenu(this, this.resources);
-    } else {
-      return undefined;
-    }
+    if (millis() - this.stateStart >= 4000) return new homeMenu(this, this.resources);
+    else return this;
   }
   
   draw(): void {
     let size = Math.min(width, height);
     let bounds = new Rect(createVector((width - size) / 2, (height - size) / 2), createVector((width + size) / 2, (height + size) / 2));
-    this.paintSplatters.forEach((splatter) => splatter.draw(bounds))
+    this.paintSplatters.forEach((splatter) => splatter.draw(bounds));
 
     if (millis() - this.stateStart > 2200) {
       let textZoomAnimationValue: number = map(millis() - this.stateStart, 2200, 2700, 0, 1, true);
