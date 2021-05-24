@@ -4,7 +4,7 @@ import * as p5Global from "p5/global";
 import Rect from "./rect.js";
 
 export default class Button {
-  text: String;
+  text: string;
   pos: p5.Vector;
   size: p5.Vector;
   stroke: p5.Color;
@@ -13,7 +13,7 @@ export default class Button {
   textColor: p5.Color;
   font: p5.Font;
 
-  constructor(text: String, pos: p5.Vector, size: p5.Vector, font: p5.Font, stroke?: p5.Color, strokeWeight?: number, fill?: p5.Color, textColor?: p5.Color) {
+  constructor(text: string, pos: p5.Vector, size: p5.Vector, font: p5.Font, stroke?: p5.Color, strokeWeight?: number, fill?: p5.Color, textColor?: p5.Color) {
     this.text = text;
     this.pos = pos;
     this.size = size;
@@ -53,8 +53,7 @@ export default class Button {
     let transpFill: p5.Color = Object.create(this.fill);
     transpFill.setAlpha(0);
     fill(lerpColor(transpFill, this.fill, opacity));
-    rect(onScreenPosition.x, onScreenPosition.y, onScreenSize.x - displayStrokeWeight * 3, onScreenSize.y);
-    rect(onScreenPosition.x, onScreenPosition.y, onScreenSize.x, onScreenSize.y - displayStrokeWeight * 3);
+    rect(onScreenPosition.x, onScreenPosition.y, onScreenSize.x - displayStrokeWeight, onScreenSize.y - displayStrokeWeight);
 
 
     // Draw stroke
@@ -67,11 +66,11 @@ export default class Button {
     rect(onScreenPosition.x - onScreenOffset.x, onScreenPosition.y, displayStrokeWeight, onScreenSize.y - displayStrokeWeight * 3);
     rect(onScreenPosition.x + onScreenOffset.x, onScreenPosition.y, displayStrokeWeight, onScreenSize.y - displayStrokeWeight * 3);
 
-    let onScreenOffset2 = createVector(onScreenOffset.x - displayStrokeWeight, onScreenOffset.y - displayStrokeWeight);
-    rect(onScreenPosition.x - onScreenOffset2.x, onScreenPosition.y - onScreenOffset2.y, displayStrokeWeight, displayStrokeWeight);
-    rect(onScreenPosition.x - onScreenOffset2.x, onScreenPosition.y + onScreenOffset2.y, displayStrokeWeight, displayStrokeWeight);
-    rect(onScreenPosition.x + onScreenOffset2.x, onScreenPosition.y - onScreenOffset2.y, displayStrokeWeight, displayStrokeWeight);
-    rect(onScreenPosition.x + onScreenOffset2.x, onScreenPosition.y + onScreenOffset2.y, displayStrokeWeight, displayStrokeWeight);
+    let squareOffset = createVector(onScreenOffset.x - displayStrokeWeight, onScreenOffset.y - displayStrokeWeight);
+    rect(onScreenPosition.x - squareOffset.x, onScreenPosition.y - squareOffset.y, displayStrokeWeight, displayStrokeWeight);
+    rect(onScreenPosition.x - squareOffset.x, onScreenPosition.y + squareOffset.y, displayStrokeWeight, displayStrokeWeight);
+    rect(onScreenPosition.x + squareOffset.x, onScreenPosition.y - squareOffset.y, displayStrokeWeight, displayStrokeWeight);
+    rect(onScreenPosition.x + squareOffset.x, onScreenPosition.y + squareOffset.y, displayStrokeWeight, displayStrokeWeight);
 
 
     // Draw text
@@ -79,9 +78,12 @@ export default class Button {
     transpTextColor.setAlpha(0);
     fill(lerpColor(transpTextColor, this.textColor, opacity));
 
+    let buttonDefaultSize = onScreenOffset.y;
+    let defaultSizeRect: any = this.font.textBounds(this.text, 0, 0, buttonDefaultSize);
+    let buttonTextSize = Math.min(onScreenOffset.y, buttonDefaultSize * onScreenSize.x/defaultSizeRect.w * 7/8);
     textAlign(CENTER, CENTER);
     textFont(this.font);
-    textSize(onScreenOffset.y);
+    textSize(buttonTextSize);
     text(this.text, onScreenPosition.x, onScreenPosition.y);
   }
 }
