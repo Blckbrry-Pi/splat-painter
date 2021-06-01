@@ -1,5 +1,5 @@
 import * as p5Global from "p5/global";
-import * as p5 from "p5";
+import p5 from "p5";
 
 import State from "./states/states.js";
 import splashScreen from "./states/splashScreen.js";
@@ -12,38 +12,41 @@ let currState: State;
 let resources: ResourceObj;
 
 function preload(): void {
-  resources = new ResourceObj();
+    resources = new ResourceObj();
+    window.gameResources = resources;
 }
 
 function setup(): void {
-  createCanvas(windowWidth, windowHeight);
-  currState = new splashScreen(undefined, resources);
-  
+    frameRate(120);
+    createCanvas(windowWidth, windowHeight);
+    currState = new splashScreen(undefined, resources);
+    
 }
 
 function draw(): void {
 
-  background(255);
+    background(255);
 
-  currState = currState.update();
-  currState.draw();
+    currState = currState.update();
+    currState.draw();
 }
 
 function windowResized(): void {
-  resizeCanvas(windowWidth, windowHeight);
+    resizeCanvas(windowWidth, windowHeight);
 }
 
 
 
 declare global {
-  interface Window {
-    p5: any;
-    gameSettings: SettingsObj;
-    preload: ()=>void;
-    setup: ()=>void;
-    draw: ()=>void;
-    windowResized: ()=>void;
-  }
+    interface Window {
+        p5: any;
+        gameSettings: SettingsObj;
+        gameResources: ResourceObj;
+        preload: ()=>void;
+        setup: ()=>void;
+        draw: ()=>void;
+        windowResized: ()=>void;
+    }
 }
 window.gameSettings = new SettingsObj();
 window.preload = preload;
