@@ -2,7 +2,7 @@ import * as p5Global from "p5/global";
 import p5 from "p5";
 
 import State from "./states/states.js";
-import splashScreen from "./states/splashScreen.js";
+import SplashScreen from "./states/splashScreen.js";
 
 import ResourceObj from "./game_objects/resourceLoader.js";
 import SettingsObj from "./game_objects/settings.js";
@@ -19,8 +19,7 @@ function preload(): void {
 function setup(): void {
     frameRate(120);
     createCanvas(windowWidth, windowHeight);
-    currState = new splashScreen(undefined, resources);
-    
+    currState = new SplashScreen(undefined, resources);
 }
 
 function draw(): void {
@@ -42,6 +41,7 @@ declare global {
         p5: any;
         gameSettings: SettingsObj;
         gameResources: ResourceObj;
+        levelsUnlocked: number[]
         preload: ()=>void;
         setup: ()=>void;
         draw: ()=>void;

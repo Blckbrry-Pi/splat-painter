@@ -1,16 +1,19 @@
 import p5 from "p5";
 
 import Rect from "./rect.js";
+import PaintSplatter from "./paintSplatter.js";
 
 export default class Level {
     paintballs: PaintBall[] = [];
     painting: Painting;
+    stars: number;
 
     constructor(json: string) {
         console.log(json);
-        let parsed_json: {paintballs: {size: number, color: {r: number, g: number, b: number}}[], painting: {r: number, g: number, b: number}[][]} = JSON.parse(json);
+        let parsed_json: {paintballs: {size: number, color: {r: number, g: number, b: number}}[], painting: {r: number, g: number, b: number}[][], stars: number} = JSON.parse(json);
 
         this.painting = this.getPainting(parsed_json.painting);
+        this.stars = parsed_json.stars;
 
         this.initPaintballs(parsed_json.paintballs);
     }
@@ -44,6 +47,8 @@ export default class Level {
     }
 
     draw(bounds: Rect): void {
+        bounds.draw(color(255));
+
         let paintingBounds: Rect = bounds.getScaledRect(new Rect(
             createVector(0.0, 0.0),
             createVector(0.8, 0.8),
@@ -74,7 +79,7 @@ export class Painting {
     }
 
     private calculateRects(): Rect[][] {
-        let recipSize: number = max(this.width, this.height);
+        let recipSize: number = this.size;
 
         return this.colorDataArray.map(
             (rowArr, indY) => rowArr.map(
@@ -95,12 +100,29 @@ export class Painting {
     }
 
     getBlank() {
-        let blankColor: p5.Color = color(255); 
+        let blankColor: p5.Color = color(255, 0); 
         return new Painting(
             this.colorDataArray.map(
                 (rowArr) => rowArr.map(
                     () => blankColor
                 ) 
+            )
+        );
+    }
+
+    setToSplatters(bounds: Rect, paintSplatters: PaintSplatter[], opacity: number = 1) {
+        this.squareBounds.forEach(
+            (rectRow, indY) => rectRow.forEach(
+                (rect, indX) => {
+                    let totalArea: number = 1;
+                    let currentColor: p5.Color = color(255);
+                    for (const splatter of paintSplatters)  currentColor = lerpColor(splatter.color, currentColor, totalArea / (totalArea + splatter.intersectingArea(bounds, bounds.getScaledRect(rect))));
+                    
+                    let transpColor: p5.Color = Object.create(currentColor);
+                    transpColor.setAlpha(0);
+
+                    this.colorDataArray[indY][indX] = lerpColor(transpColor, currentColor, opacity);
+                }
             )
         );
     }
@@ -111,6 +133,10 @@ export class Painting {
 
     get height(): number {
         return this.colorDataArray.length;
+    }
+
+    get size(): number {
+        return max(this.width, this.height);
     }
 }
 

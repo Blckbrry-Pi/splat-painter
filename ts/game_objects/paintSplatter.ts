@@ -44,9 +44,7 @@ export default class PaintSplatter {
     }
 
     private generateSquares(squareCount: number): void {
-        for (let i = 0; i < squareCount; i++) {
-            this.squares.push(this.generateSquare());
-        }
+        for (let i = 0; i < squareCount; i++) this.squares.push(this.generateSquare());
     }
     private generateSquare(): Rect {
         let pos1 = createVector(randomGaussian(0.5, 0.3), randomGaussian(0.5, 0.3));
@@ -57,9 +55,21 @@ export default class PaintSplatter {
         return new Rect(pos1, pos2);
     }
 
-    draw(bounds: Rect): void {
+    intersectingArea(bounds: Rect, targetRect: Rect) {
+        return this.getScaledSquares(bounds).reduce((currentArea, square) => currentArea + square.areaOfIntersection(targetRect), 0);
+    }
+
+    draw(bounds: Rect, opacity: number = 1): void {
+        let transpColor: p5.Color = Object.create(this.color);
+        transpColor.setAlpha(0);
+        const newColor = lerpColor(transpColor, this.color, opacity);
+
+        this.getScaledSquares(bounds).forEach((square) => square.draw(newColor));
+    }
+
+    private getScaledSquares(bounds: Rect): Rect[] {
         const sizeVec = createVector(this.size / 20, this.size / 20);
         let boundingRect = new Rect(bounds.getScaledPoint(window.p5.Vector.sub(this.pos, sizeVec)), bounds.getScaledPoint(window.p5.Vector.add(this.pos, sizeVec)));
-        this.squares.forEach((square) => boundingRect.getScaledRect(square).draw(this.color));
+        return this.squares.map((square) => boundingRect.getScaledRect(square));
     }
 }

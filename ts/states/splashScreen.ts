@@ -5,7 +5,7 @@ import PaintSplatter from "../game_objects/paintSplatter.js";
 import Rect from "../game_objects/rect.js";
 import ResourceObj from "../game_objects/resourceLoader.js";
 
-export default class {
+export default class SplashScreen {
     resources: ResourceObj;
     stateStart: number;
     paintSplatters: PaintSplatter[];

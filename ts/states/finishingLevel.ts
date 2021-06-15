@@ -1,7 +1,8 @@
 import p5 from "p5";
 
 import State from "./states";
-import FinishingLevel from "./finishingLevel.js";
+import InLevel from "./inLevel";
+import LevelEndScreen from "./levelEndScreen.js";
 
 import Level, { PaintBall, Painting } from "../game_objects/level.js";
 import Rect from "../game_objects/rect.js";
@@ -9,48 +10,39 @@ import Rect from "../game_objects/rect.js";
 import ResourceObj from "../game_objects/resourceLoader.js";
 import PaintSplatter from "../game_objects/paintSplatter.js";
 
-export default class InLevel {
+export default class FinishingLevel {
     levelPlaying: Level;
     paintingDrawing: Painting;
-    paintSplatters: PaintSplatter[] = [];
-
-    onMousePress: boolean = false;
-    mouseWasPressed: boolean = true;
+    paintSplatters: PaintSplatter[];
     
     resources: ResourceObj;
 
     stateStart: number;
 
-    constructor(prevState: State, resources: ResourceObj, levelToLoad: Level) {
+    constructor(prevState: InLevel, resources: ResourceObj) {
         this.resources = resources;
         this.stateStart = window.millis !== undefined ? millis() : 0;
+        
+        this.levelPlaying = prevState.levelPlaying;
+        this.paintingDrawing = prevState.paintingDrawing;
+        this.paintSplatters = prevState.paintSplatters;
 
-        this.levelPlaying = levelToLoad.clone();
-        this.paintingDrawing = levelToLoad.painting.getBlank();
     }
 
     update(): State {
-        this.onMousePress = mouseIsPressed && !this.mouseWasPressed;
-        this.mouseWasPressed = mouseIsPressed;
-
         let {showBounds, playBounds} = this.calculateBounds();
-        
-        let relativeMouse: p5.Vector = playBounds.getUnscaledPoint(createVector(mouseX, mouseY));
 
-        if (this.onMousePress && playBounds.pointInBounds(createVector(mouseX, mouseY))) {
-            let nextPaintball = this.levelPlaying.paintballs.shift()
-            if (nextPaintball !== undefined) this.generatePaintSplatter(nextPaintball, relativeMouse);
-        }
+        this.paintingDrawing.setToSplatters(playBounds, this.paintSplatters, map(millis() - this.stateStart, 1000, 2500, 0, 1, true));
 
-        if (this.levelPlaying.paintballs.length <= 0) return new FinishingLevel(this, this.resources);
-        return this;
+        if (millis() - this.stateStart > 4000) return new LevelEndScreen(this, this.resources);
+        else return this;
     }
 
     draw(): void {
         let {showBounds, playBounds} = this.calculateBounds();
 
 
-        this.paintSplatters.forEach((paintSplatter) => paintSplatter.draw(playBounds));
+        this.paintSplatters.forEach((paintSplatter) => paintSplatter.draw(playBounds, map(millis() - this.stateStart, 1000, 2500, 1, 0, true)));
 
         this.levelPlaying.draw(showBounds);
 
@@ -84,13 +76,5 @@ export default class InLevel {
         }
 
         return {showBounds, playBounds};
-    }
-
-    generatePaintSplatter(paintball: PaintBall, position: p5.Vector): void {
-        this.paintSplatters.push(new PaintSplatter(
-            position,
-            paintball.size / this.levelPlaying.painting.size * 5,
-            paintball.color
-        ));
     }
 }

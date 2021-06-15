@@ -8,7 +8,7 @@ import Rect from "../game_objects/rect.js";
 
 import ResourceObj from "../game_objects/resourceLoader.js";
 
-export default class {
+export default class SettingsPage {
     resources: ResourceObj;
     
     onMousePress: boolean = false;
@@ -174,7 +174,7 @@ export default class {
         
         let stateOpacity = (this.stateEnd ? constrain(this.stateEnd - millis(), 0, 200) : constrain(millis() - this.stateStart, 0, 200)) / 200;
 
-        fill(0, stateOpacity * 200)
+        fill(0, stateOpacity * 200);
         noStroke();
         rectMode(CORNER);
         rect(0, 0, width, height);
