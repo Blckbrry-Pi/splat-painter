@@ -2,7 +2,7 @@ import Level from "./level.js";
 export default class ResourceObj {
     constructor() {
         this.levels = [];
-        this.commodoreFont = loadFont("/resources/Commodore.ttf");
+        this.commodoreFont = loadFont("resources/Commodore.ttf");
         this.loadLevels();
     }
     async loadLevels() {
@@ -10,7 +10,7 @@ export default class ResourceObj {
         filesToFetch.forEach(async (filePath) => this.levels.push(new Level(await (async (res) => res.ok ? res.text() : "")(await fetch(filePath)))));
     }
     async getLevelMetadata() {
-        return fetch("/resources/levelMetadata.paths").then(res => {
+        return fetch("resources/levelMetadata.paths").then(res => {
             if (res.ok)
                 return res.text();
             else

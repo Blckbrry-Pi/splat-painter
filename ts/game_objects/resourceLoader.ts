@@ -8,7 +8,7 @@ export default class ResourceObj {
     levels: Level[] = [];
 
     constructor() {
-        this.commodoreFont = loadFont("/resources/Commodore.ttf");
+        this.commodoreFont = loadFont("resources/Commodore.ttf");
         this.loadLevels();
     }
 
@@ -19,7 +19,7 @@ export default class ResourceObj {
     }
 
     private async getLevelMetadata(): Promise<string[]> {
-        return fetch("/resources/levelMetadata.paths").then(
+        return fetch("resources/levelMetadata.paths").then(
         res => {
             if (res.ok) return res.text();
             else return "";
