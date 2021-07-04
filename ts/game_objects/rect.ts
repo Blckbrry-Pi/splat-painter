@@ -73,8 +73,16 @@ export default class Rect {
         fill(color);
         strokeWeight(sqrt(this.getSize().magSq() / 2) / 50);
         if (strokeColor === undefined) noStroke();
-        else stroke(0);
+        else stroke(strokeColor);
         rectMode(CORNERS);
         rect(this.pos1.x, this.pos1.y, this.pos2.x, this.pos2.y);
+    }
+
+    get width(): number {
+        return this.pos2.x - this.pos1.x;
+    }
+
+    get height(): number {
+        return this.pos2.y - this.pos1.y;
     }
 }

@@ -7,56 +7,38 @@ export default class PaintSplatter {
     pos: p5.Vector;
     size: number;
     color: p5.Color;
+    density: number;
     squares: Rect[];
 
-    constructor(optPos?: p5.Vector, size?: number, optColor?: p5.Color) {
-        switch (optPos) {
-            case undefined:
-                this.pos = createVector(random(), random());
-                break;
-            
-            default:
-                this.pos = optPos;
-        }
+    constructor(optPos?: p5.Vector, optSize?: number, optColor?: p5.Color, optDensity?: number) {
+        this.pos = optPos === undefined ? createVector(random(), random()) : optPos;
 
+        this.size = optSize === undefined ? random(1, 3) : optSize;
 
-        switch (size) {
-            case undefined:
-                this.size = random(1,3);
-                break;
-            
-            default:
-                this.size = size;
-        }
+        this.color = optColor === undefined ? color(random(255), random(255), random(255)) : optColor;
 
-
-        switch (optColor) {
-            case undefined:
-                this.color = color(random(255), random(255), random(255));
-                break;
-            
-            default:
-                this.color = optColor;
-        }
+        this.density = optDensity === undefined ? 1 : optDensity;
 
         this.squares = [];
-        this.generateSquares(20);
+        this.generateSquares(20 * Math.sqrt(this.density));
     }
 
     private generateSquares(squareCount: number): void {
         for (let i = 0; i < squareCount; i++) this.squares.push(this.generateSquare());
     }
     private generateSquare(): Rect {
-        let pos1 = createVector(randomGaussian(0.5, 0.3), randomGaussian(0.5, 0.3));
-        let avgDist = pos1.dist(createVector(0.5, 0.5)) / 2;
+        let middle = createVector(randomGaussian(0.5, 0.3), randomGaussian(0.5, 0.3));
+        let avgDist = middle.dist(createVector(0.5, 0.5)) / 2;
         let sqSize = randomGaussian(0.5 - avgDist, 0.1);
-        let pos2 = window.p5.Vector.add(pos1, createVector(sqSize, sqSize));
-        
+        let pos1 = window.p5.Vector.add(middle, createVector(sqSize, sqSize).div(2));
+        let pos2 = window.p5.Vector.sub(middle, createVector(sqSize, sqSize).div(2));
+
+
         return new Rect(pos1, pos2);
     }
 
     intersectingArea(bounds: Rect, targetRect: Rect) {
-        return this.getScaledSquares(bounds).reduce((currentArea, square) => currentArea + square.areaOfIntersection(targetRect), 0);
+        return Math.sqrt(this.density) * this.getScaledSquares(bounds).reduce((currentArea, square) => currentArea + square.areaOfIntersection(targetRect), 0);
     }
 
     draw(bounds: Rect, opacity: number = 1): void {

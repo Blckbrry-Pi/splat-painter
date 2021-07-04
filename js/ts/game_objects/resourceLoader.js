@@ -1,19 +1,9 @@
 import Level from "./level.js";
-import resizeNN from "../libs/resizeNN.js";
 export default class ResourceObj {
     constructor() {
         this.levels = [];
         this.commodoreFont = loadFont("resources/Commodore.ttf");
         this.loadLevels();
-        this.images = {
-            star: {
-                gray: createImage(0, 0),
-                yellow: createImage(0, 0),
-            },
-        };
-        loadImage("resources/images/star/star_gray.png", (image) => this.images.star.gray = resizeNN(image, 1000, 0));
-        loadImage("resources/images/star/star_yellow.png", (image) => this.images.star.yellow = resizeNN(image, 1000, 0));
-        this.images.star.gray;
     }
     async loadLevels() {
         let filesToFetch = await this.getLevelMetadata();

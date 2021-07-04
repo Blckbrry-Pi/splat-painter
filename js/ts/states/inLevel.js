@@ -29,7 +29,6 @@ export default class InLevel {
         return this;
     }
     draw() {
-        background(215);
         let { showBounds, playBounds } = this.calculateBounds();
         this.paintSplatters.forEach((paintSplatter) => paintSplatter.draw(playBounds));
         this.levelPlaying.level.draw(showBounds);
@@ -51,6 +50,6 @@ export default class InLevel {
         return { showBounds, playBounds };
     }
     generatePaintSplatter(paintball, position) {
-        this.paintSplatters.push(new PaintSplatter(position, paintball.size / this.levelPlaying.level.painting.size * 5, color(...paintball.color.levels), paintball.density));
+        this.paintSplatters.push(new PaintSplatter(position, paintball.size / this.levelPlaying.level.painting.size * 5, paintball.color));
     }
 }

@@ -60,14 +60,8 @@ export default class Rect {
         if (strokeColor === undefined)
             noStroke();
         else
-            stroke(strokeColor);
+            stroke(0);
         rectMode(CORNERS);
         rect(this.pos1.x, this.pos1.y, this.pos2.x, this.pos2.y);
-    }
-    get width() {
-        return this.pos2.x - this.pos1.x;
-    }
-    get height() {
-        return this.pos2.y - this.pos1.y;
     }
 }

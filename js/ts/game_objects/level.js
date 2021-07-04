@@ -1,5 +1,4 @@
 import Rect from "./rect.js";
-import * as RGBLAB from "../libs/rgbLabConversions.js";
 export default class Level {
     constructor(json) {
         this.paintballs = [];
@@ -7,7 +6,6 @@ export default class Level {
         let parsed_json = JSON.parse(json);
         this.painting = this.getPainting(parsed_json.painting);
         this.stars = parsed_json.stars;
-        this.offset = parsed_json.offset;
         this.initPaintballs(parsed_json.paintballs);
     }
     getPainting(painting_json) {
@@ -20,7 +18,7 @@ export default class Level {
         return new Painting(colorArray);
     }
     initPaintballs(paintballs_json) {
-        this.paintballs = paintballs_json.map((paintball_json) => new PaintBall(paintball_json.size, paintball_json.density, color(paintball_json.color.r, paintball_json.color.g, paintball_json.color.b)));
+        this.paintballs = paintballs_json.map((paintball_json) => new PaintBall(paintball_json.size, color(paintball_json.color.r, paintball_json.color.g, paintball_json.color.b)));
     }
     clone() {
         let clonedLevel = Object.create(this);
@@ -28,7 +26,7 @@ export default class Level {
         return clonedLevel;
     }
     draw(bounds) {
-        bounds.draw(color(215));
+        bounds.draw(color(255));
         let paintingBounds = bounds.getScaledRect(new Rect(createVector(0.0, 0.0), createVector(0.8, 0.8)));
         this.painting.draw(paintingBounds);
         fill(0);
@@ -70,23 +68,6 @@ export class Painting {
             this.colorDataArray[indY][indX] = lerpColor(transpColor, currentColor, opacity);
         }));
     }
-    comparePainting(other) {
-        if (this.width !== other.width || this.height !== other.height)
-            return 0;
-        let totalPoints = 0;
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                const thisRGBA = this.colorDataArray[y][x].levels;
-                const thisRGB = [thisRGBA[0], thisRGBA[1], thisRGBA[2]];
-                const thisLAB = RGBLAB.rgb2lab(thisRGB);
-                const otherRGBA = other.colorDataArray[y][x].levels;
-                const otherRGB = [otherRGBA[0], otherRGBA[1], otherRGBA[2]];
-                const otherLAB = RGBLAB.rgb2lab(otherRGB);
-                totalPoints += 100 - RGBLAB.deltaE(thisLAB, otherLAB);
-            }
-        }
-        return totalPoints;
-    }
     get width() {
         return this.colorDataArray[0].length;
     }
@@ -98,9 +79,8 @@ export class Painting {
     }
 }
 export class PaintBall {
-    constructor(size, density, color) {
+    constructor(size, color) {
         this.size = size;
-        this.density = density;
         this.color = color;
     }
     draw(bounds, index) {
@@ -109,7 +89,7 @@ export class PaintBall {
         strokeWeight(bounds.getScaledNumber(0.01));
         ellipseMode(CENTER);
         let ellipsePos = bounds.getScaledPoint(createVector(0.9, 0.9 - 0.2 * index));
-        let ellipseSize = bounds.getScaledSize(createVector(0.08, 0.08).mult(Math.cbrt(this.size)));
+        let ellipseSize = bounds.getScaledSize(createVector(0.08, 0.08).mult(sqrt(this.size)));
         ellipse(ellipsePos.x, ellipsePos.y, ellipseSize.x, ellipseSize.y);
         fill(0);
         noStroke();

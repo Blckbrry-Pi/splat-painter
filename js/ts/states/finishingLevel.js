@@ -10,16 +10,15 @@ export default class FinishingLevel {
     }
     update() {
         let { showBounds, playBounds } = this.calculateBounds();
-        this.paintingDrawing.setToSplatters(playBounds, this.paintSplatters, map(millis() - this.stateStart, 2000, 3500, 0, 1, true));
-        if (millis() - this.stateStart > 8000)
+        this.paintingDrawing.setToSplatters(playBounds, this.paintSplatters, map(millis() - this.stateStart, 1000, 2500, 0, 1, true));
+        if (millis() - this.stateStart > 4000)
             return new LevelEndScreen(this, this.resources);
         else
             return this;
     }
     draw() {
-        background(215);
         let { showBounds, playBounds } = this.calculateBounds();
-        this.paintSplatters.forEach((paintSplatter) => paintSplatter.draw(playBounds, map(millis() - this.stateStart, 2000, 3500, 1, 0, true)));
+        this.paintSplatters.forEach((paintSplatter) => paintSplatter.draw(playBounds, map(millis() - this.stateStart, 1000, 2500, 1, 0, true)));
         this.levelPlaying.level.draw(showBounds);
         this.paintingDrawing.draw(playBounds);
     }

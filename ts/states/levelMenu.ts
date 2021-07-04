@@ -63,7 +63,14 @@ export default class LevelMenu {
         if (this.onMousePress)
             for (let i = 0; i < this.buttons.length; i++)
                 if (this.buttons[i].isHovered(relativeMouse))
-                    return new InLevel(this, this.resources, this.resources.levels[this.pageNumber * 25 + i]);
+                    return new InLevel(
+                        this,
+                        this.resources,
+                        {
+                            level: this.resources.levels[this.pageNumber * 25 + i],
+                            levelNum: this.pageNumber * 25 + i,
+                        }
+                    );
         
         return this;
     }

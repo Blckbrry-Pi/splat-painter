@@ -1,11 +1,13 @@
 import * as p5Global from "p5/global";
-import p5 from "p5";
+import * as p5 from "p5";
 
 import State from "./states/states.js";
 import SplashScreen from "./states/splashScreen.js";
 
 import ResourceObj from "./game_objects/resourceLoader.js";
 import SettingsObj from "./game_objects/settings.js";
+
+import extendImagePrototypeWithResizeNN from "./libs/resizeNN";
 
 let currState: State;
 
@@ -19,6 +21,7 @@ function preload(): void {
 function setup(): void {
     frameRate(120);
     createCanvas(windowWidth, windowHeight);
+
     currState = new SplashScreen(undefined, resources);
 }
 

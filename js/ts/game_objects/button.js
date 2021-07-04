@@ -52,7 +52,9 @@ export default class Button {
         rect(onScreenPosition.x + squareOffset.x, onScreenPosition.y - squareOffset.y, displayStrokeWeight, displayStrokeWeight);
         rect(onScreenPosition.x + squareOffset.x, onScreenPosition.y + squareOffset.y, displayStrokeWeight, displayStrokeWeight);
         // Draw text
-        fill(this.textColor.levels[0], this.textColor.levels[1], this.textColor.levels[2], lerp(0, this.textColor.levels[3], opacity));
+        let transpTextColor = Object.create(this.textColor);
+        transpTextColor.setAlpha(0);
+        fill(lerpColor(transpTextColor, this.textColor, opacity));
         let buttonDefaultSize = onScreenOffset.y;
         let defaultSizeRect = this.font.textBounds(this.text, 0, 0, buttonDefaultSize);
         let buttonTextSize = Math.min(onScreenOffset.y, buttonDefaultSize * onScreenSize.x / defaultSizeRect.w * 7 / 8);

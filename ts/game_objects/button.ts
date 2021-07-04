@@ -74,9 +74,12 @@ export default class Button {
 
 
         // Draw text
-        let transpTextColor: p5.Color = Object.create(this.textColor);
-        transpTextColor.setAlpha(0);
-        fill(lerpColor(transpTextColor, this.textColor, opacity));
+        fill(
+            this.textColor.levels[0],
+            this.textColor.levels[1],
+            this.textColor.levels[2],
+            lerp(0, this.textColor.levels[3], opacity)
+        );
 
         let buttonDefaultSize = onScreenOffset.y;
         let defaultSizeRect: any = this.font.textBounds(this.text, 0, 0, buttonDefaultSize);

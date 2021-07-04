@@ -3,17 +3,21 @@ import p5 from "p5";
 import Rect from "./rect.js";
 import PaintSplatter from "./paintSplatter.js";
 
+import * as RGBLAB from "../libs/rgbLabConversions.js";
+
 export default class Level {
     paintballs: PaintBall[] = [];
     painting: Painting;
-    stars: number;
+    stars: [number, number, number];
+    offset: number;
 
     constructor(json: string) {
         console.log(json);
-        let parsed_json: {paintballs: {size: number, color: {r: number, g: number, b: number}}[], painting: {r: number, g: number, b: number}[][], stars: number} = JSON.parse(json);
+        let parsed_json: {paintballs: {size: number, density: number, color: {r: number, g: number, b: number}}[], painting: {r: number, g: number, b: number}[][], offset: number, stars: [number, number, number]} = JSON.parse(json);
 
         this.painting = this.getPainting(parsed_json.painting);
         this.stars = parsed_json.stars;
+        this.offset = parsed_json.offset;
 
         this.initPaintballs(parsed_json.paintballs);
     }
@@ -31,10 +35,11 @@ export default class Level {
         return new Painting(colorArray);
     }
 
-    private initPaintballs(paintballs_json: {size: number, color: {r: number, g: number, b: number}}[]): void {
+    private initPaintballs(paintballs_json: {size: number, density: number, color: {r: number, g: number, b: number}}[]): void {
         this.paintballs = paintballs_json.map(
             (paintball_json) => new PaintBall(
                 paintball_json.size,
+                paintball_json.density,
                 color(paintball_json.color.r, paintball_json.color.g, paintball_json.color.b)
             )
         );
@@ -47,7 +52,7 @@ export default class Level {
     }
 
     draw(bounds: Rect): void {
-        bounds.draw(color(255));
+        bounds.draw(color(215));
 
         let paintingBounds: Rect = bounds.getScaledRect(new Rect(
             createVector(0.0, 0.0),
@@ -116,7 +121,11 @@ export class Painting {
                 (rect, indX) => {
                     let totalArea: number = 1;
                     let currentColor: p5.Color = color(255);
-                    for (const splatter of paintSplatters)  currentColor = lerpColor(splatter.color, currentColor, totalArea / (totalArea + splatter.intersectingArea(bounds, bounds.getScaledRect(rect))));
+                    for (const splatter of paintSplatters)  {
+                        let currentSplatterArea = splatter.intersectingArea(bounds, bounds.getScaledRect(rect))
+                        currentColor = lerpColor(splatter.color, currentColor, totalArea / (totalArea + currentSplatterArea));
+                        totalArea += currentSplatterArea;
+                    }
                     
                     let transpColor: p5.Color = Object.create(currentColor);
                     transpColor.setAlpha(0);
@@ -125,6 +134,28 @@ export class Painting {
                 }
             )
         );
+    }
+
+    comparePainting(other: Painting): number {
+        if (this.width !== other.width || this.height !== other.height) return 0;
+
+        let totalPoints: number = 0;
+
+        for (let x = 0; x < this.width; x++) {
+            for (let y = 0; y < this.height; y++) {
+                const thisRGBA: [number, number, number, number] = this.colorDataArray[y][x].levels;
+                const thisRGB: [number, number, number] = [thisRGBA[0], thisRGBA[1], thisRGBA[2]];
+                const thisLAB: [number, number, number] = RGBLAB.rgb2lab(thisRGB);
+
+                const otherRGBA: [number, number, number, number] = other.colorDataArray[y][x].levels;
+                const otherRGB: [number, number, number] = [otherRGBA[0], otherRGBA[1], otherRGBA[2]];
+                const otherLAB: [number, number, number] = RGBLAB.rgb2lab(otherRGB);
+
+                totalPoints += 100 - RGBLAB.deltaE(thisLAB, otherLAB);
+            }
+        }
+
+        return totalPoints;
     }
 
     get width(): number {
@@ -144,10 +175,12 @@ export class Painting {
 
 export class PaintBall {
     size: number;
+    density: number;
     color: p5.Color;
 
-    constructor(size: number, color: p5.Color) {
+    constructor(size: number, density: number, color: p5.Color) {
         this.size = size;
+        this.density = density;
         this.color = color;
     }
 
@@ -159,7 +192,7 @@ export class PaintBall {
 
         ellipseMode(CENTER);
         let ellipsePos:  p5.Vector = bounds.getScaledPoint(createVector(0.9, 0.9 - 0.2 * index));
-        let ellipseSize: p5.Vector = bounds.getScaledSize(createVector(0.08, 0.08).mult(sqrt(this.size)));
+        let ellipseSize: p5.Vector = bounds.getScaledSize(createVector(0.08, 0.08).mult(Math.cbrt(this.size)));
         ellipse(ellipsePos.x, ellipsePos.y, ellipseSize.x, ellipseSize.y);
 
 
